@@ -1,0 +1,290 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Hello World App
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths
+basePath: /api
+#
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+
+  /hello:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: hello_world
+    get:
+      description: Returns 'Hello' to the caller
+      # used as the method name of the controller
+      operationId: hello
+      parameters:
+        - name: name
+          in: query
+          description: The name of the person to whom to say hello
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/HelloWorldResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        
+  /entidades:
+    x-swagger-router-controller: data.controller
+    get:
+      description: Muestra la lista de entidades
+      operationId: getEstados
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GetEntidadListResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /municipios:
+    x-swagger-router-controller: data.controller
+    get:
+      description: Muestra la lista de municipios
+      operationId: getMunicipios
+      parameters:
+        - name: entidad
+          in: query
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GetMunicipioListResponse"
+        default:
+          description: Error
+          schema: 
+            $ref: "#/definitions/ErrorResponse"
+
+  /bancos:
+    x-swagger-router-controller: data.controller
+    get:
+      description: Muestra la lista de bancos 
+      operationId: getBancos
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GetBancoListResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /censobymun:
+    x-swagger-router-controller: data.controller
+    get:
+      description: Muestra la lista de los censos por municipio
+      operationId: getCensosByMun
+      parameters:
+        - name: entidad
+          in: query
+          type: string
+          required: true
+        - name: municipio
+          in: query
+          type: string
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GetCensoListResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /censobyedo:
+    x-swagger-router-controller: data.controller
+    get:
+      description: Muestra la listta de los censos por estado
+      operationId: getCensosByEdo
+      parameters:
+        - name: entidad
+          in: query
+          type: string
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GetCensoListResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /denues:
+    x-swagger-router-controller: data.controller
+    get:
+      description: Muestra los denues 
+      operationId: getDenues
+      parameters:
+        - name: entidad
+          in: query
+          type: string
+          required: true
+        - name: municipio
+          in: query
+          type: string
+          required: true
+        - name: tipo
+          in: query
+          type: string
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GetDenueListResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+            
+
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  HelloWorldResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+
+  GetMunicipioResponse:
+    type: object
+    properties: 
+      id:
+        type: string
+        description: identificador
+      idmunicipio:
+        type: string
+        description: id del municipio
+      municipio:
+        type: string
+        description: Nombre del municipio
+
+  GetMunicipioListResponse:
+    required:
+      - municipios
+    properties:
+      municipios:
+        type: array
+        items:
+          $ref: "#/definitions/GetMunicipioResponse"
+
+  GetEntidadResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        description: identificador
+      idestado:
+        type: string
+        description: identificador del estado
+      estado:
+        type: string
+        description: Nombre del estado
+  
+  GetEntidadListResponse:
+    required:
+      - entidad
+    properties:
+      entidad:
+        type: array
+        items:
+          $ref: "#/definitions/GetEntidadResponse"
+
+  GetBancoResponse:
+    type: object
+    properties: 
+      id:
+        type: string
+        description: identificador
+      tipo:
+        type: string
+        description: Tipo de banco
+      descripcion:
+        type: string
+        description: Descripcion del banco
+        
+  GetBancoListResponse:
+    required:
+      - banco
+    properties:
+      banco:
+        type: array
+        items:
+          $ref: "#/definitions/GetBancoResponse"
+
+  GetCensoResponse:
+    type: object
+    properties:
+      idestado:
+        type: string
+        description: identificador del estado
+      idmunicipio:
+        type: string
+        description: identificador del municipio
+
+  GetCensoListResponse:
+    required:
+      - censo
+    properties:
+      censo:
+        type: array
+        items:
+          $ref: "#/definitions/GetCensoResponse"
+
+  GetDenueResponse:
+    type: object
+    properties:
+      idestado:
+        type: string
+        description: identificador del estado
+      idmunicipio:
+        type: string
+        description: identificador del municipio
+
+  GetDenueListResponse:
+    required:
+      - denue
+    properties:
+      denue:
+        type: array
+        items: 
+          $ref: "#/definitions/GetDenueResponse"
+          
+          
